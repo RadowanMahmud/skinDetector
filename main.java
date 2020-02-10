@@ -1,6 +1,7 @@
 package train;
 
 import java.io.IOException;
+import app.test;
 
 public class main {
 
@@ -21,8 +22,12 @@ public class main {
         }
 
         process p=new process();
+        test t=new test();
         try {
-            p.minedata(imagepaths,maskapaths);
+            for(int i=1;i<=5;i++){
+                p.minedata(imagepaths,maskapaths,i);
+                t.run(i);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

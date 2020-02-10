@@ -1,5 +1,7 @@
 package app;
 
+import train.getFiles;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -58,13 +60,13 @@ public class test {
             for(int i=0;i<mainpic.getWidth();i++){
                 for(int j=0;j<mainpic.getHeight();j++){
                     Color mainpiccolor=new Color(mainpic.getRGB(i,j));
-                    if(keepresult[mainpiccolor.getRed()][mainpiccolor.getGreen()][mainpiccolor.getBlue()]<1.0){
-                        System.out.println("it is non skin");
+                    if(keepresult[mainpiccolor.getRed()][mainpiccolor.getGreen()][mainpiccolor.getBlue()]<0.3){
+                       // System.out.println("it is non skin");
                             mainpic.setRGB(i,j,white);
                     }
                     else{
                        // mainpic.setRGB(i,j,white);
-                        System.out.println("it is  skin");
+                       // System.out.println("it is  skin");
                     }
                 }
             }
@@ -72,18 +74,33 @@ public class test {
             e.printStackTrace();
         }
         try {
-            ImageIO.write(mainpic, "bmp", new File("duke.bmp"));
+            ImageIO.write(mainpic, "bmp", new File(output));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
 
-    public static void main(String[] args) {
-        String image="nargis.jpeg";
-        String outputimage="output.bmp";
-        String filepTH="knowledge.dat";
+    public void run(int p){
+        String imageFolderPath="data/images";
+        String output="data/output/";
+        //String maskFolderPath="data/mask";
 
-        new test().detectSkin(image,outputimage,filepTH);
+        getFiles GetImage=new getFiles();
+        String[] imagepaths=GetImage.GetAllFilesInFolder(imageFolderPath);
+        int level=0;
+        if(p!=5)level=(imagepaths.length/5)*p;
+        for(int k=level;k<level+(imagepaths.length/5) && k<imagepaths.length;k++) {
+            String image=imagepaths[k];
+            System.out.println(p+" this is "+k);
+            String filepTH="knowledge.dat";
+            String outputimage=output+"output"+k+".bmp";
+            new test().detectSkin(image,outputimage,filepTH);
+
+        }
+    }
+
+    public static void main(String[] args) {
+
     }
 }

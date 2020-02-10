@@ -28,47 +28,62 @@ public class process {
         }
     }
 
-    public void minedata(String[] images,String[] masks) throws IOException {
+    public void training(String[] images,String[] masks,int k){
+        System.out.println(k);
+        System.out.println(images[k]);
+        System.out.println(masks[k]);
+
+        File mainImage=new File(images[k]);
+        File maskImage=new File(masks[k]);
+
+        BufferedImage mainpic=null;
+        BufferedImage maskpic=null;
+
+        try {
+            mainpic= ImageIO.read(mainImage);
+            maskpic= ImageIO.read(maskImage);
+            int r,g,b;
+            for(int i=0;i<mainpic.getHeight();i++){
+                for(int j=0;j<mainpic.getWidth();j++){
+                    Color mainpiccolor=new Color(mainpic.getRGB(j,i));
+                    Color maskpiccolor=new Color(maskpic.getRGB(j,i));
+                    r=mainpiccolor.getRed();
+                    g=mainpiccolor.getGreen();
+                    b=mainpiccolor.getBlue();
+                    // System.out.println(maskpic.getRGB(j,i));
+                    if(maskpiccolor.getRed()>=255 && maskpiccolor.getGreen()>=255 && maskpiccolor.getBlue()>=255){
+                        // System.out.println("it is non skin");
+                        nonskin[r][g][b]++;
+                    }
+                    else{
+                        // System.out.println("it is skin");
+                        skin[r][g][b]++;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void determineImage(String[] images,String[] masks,int p){
+        int cout = 0;
+        if(p==5){
+            cout=100;
+        }
+        for(int k=cout;k<(images.length/5)*p;k++){
+            training(images,masks,k);
+        }
+        for(int k=(images.length/5)*p+(images.length/5);k<images.length;k++){
+            training(images,masks,k);
+        }
+    }
+
+    public void minedata(String[] images,String[] masks,int p) throws IOException {
 
         initialArray();
 
-        for(int k=0;k<images.length;k++){
-            System.out.println(k);
-            System.out.println(images[k]);
-            System.out.println(masks[k]);
-
-            File mainImage=new File(images[k]);
-            File maskImage=new File(masks[k]);
-
-            BufferedImage mainpic=null;
-            BufferedImage maskpic=null;
-
-            try {
-                mainpic= ImageIO.read(mainImage);
-                maskpic= ImageIO.read(maskImage);
-                int r,g,b;
-                for(int i=0;i<mainpic.getHeight();i++){
-                    for(int j=0;j<mainpic.getWidth();j++){
-                        Color mainpiccolor=new Color(mainpic.getRGB(j,i));
-                        Color maskpiccolor=new Color(maskpic.getRGB(j,i));
-                        r=mainpiccolor.getRed();
-                        g=mainpiccolor.getGreen();
-                        b=mainpiccolor.getBlue();
-                       // System.out.println(maskpic.getRGB(j,i));
-                        if(maskpiccolor.getRed()>=230 && maskpiccolor.getGreen()>=230 && maskpiccolor.getBlue()>=230){
-                           // System.out.println("it is non skin");
-                            nonskin[r][g][b]++;
-                        }
-                        else{
-                           // System.out.println("it is skin");
-                            skin[r][g][b]++;
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        determineImage(images,masks,p);
 
         double totalskincount=0;
         double totalnonskincount=0;
@@ -113,7 +128,7 @@ public class process {
                     else {
                         keepresult[i][j][k]=skin[i][j][k]/nonskin[i][j][k];
                     }
-                    System.out.println(String.format("%.3f\n", keepresult[i][j][k]));
+                    //System.out.println(String.format("%.3f\n", keepresult[i][j][k]));
                     mainBW.append(String.format("%.3f\n", keepresult[i][j][k]));
                 }
             }
