@@ -58,12 +58,17 @@ public class accur {
         BufferedImage maskpic=null;
         double total_pixel=0;
         double right_count=0;
+        double tp=0,tn=0,fp=0,fn=0;
 
         try {
             mainpic= ImageIO.read(mainImage);
             maskpic= ImageIO.read(maskImage);
             total_pixel=mainpic.getHeight()*mainpic.getWidth();
             right_count=0;
+            tp=0;
+            tn=0;
+            fp=0;
+            fn=0;
             int r,g,b;
             for(int i=0;i<mainpic.getHeight();i++){
                 for(int j=0;j<mainpic.getWidth();j++){
@@ -73,18 +78,26 @@ public class accur {
                     g=mainpiccolor.getGreen();
                     b=mainpiccolor.getBlue();
                     // System.out.println(maskpic.getRGB(j,i));
-                    if(maskpiccolor.getRed()>=245 && maskpiccolor.getGreen()>=245 && maskpiccolor.getBlue()>=245){
-                        if(keepresult[mainpiccolor.getRed()][mainpiccolor.getGreen()][mainpiccolor.getBlue()]<0.25){
+                    if(maskpiccolor.getRed()>=255 && maskpiccolor.getGreen()>=255 && maskpiccolor.getBlue()>=255){
+                        if(keepresult[mainpiccolor.getRed()][mainpiccolor.getGreen()][mainpiccolor.getBlue()]<0.3){
                             // System.out.println("it is non skin");
                             right_count++;
+                            tn++;
+                        }
+                        else{
+                            fp++;
                         }
                     }
                     else{
                         // System.out.println("it is skin");
                         //skin[r][g][b]++;
-                        if(keepresult[mainpiccolor.getRed()][mainpiccolor.getGreen()][mainpiccolor.getBlue()]>0.25){
+                        if(keepresult[mainpiccolor.getRed()][mainpiccolor.getGreen()][mainpiccolor.getBlue()]>0.3){
                             // System.out.println("it is non skin");
                             right_count++;
+                            tp++;
+                        }
+                        else{
+                            fn++;
                         }
                     }
                 }
@@ -93,7 +106,7 @@ public class accur {
             e.printStackTrace();
         }
         finally {
-            return right_count/total_pixel;
+            return (tp+tn)/(tp+tn+fp+fn);
         }
     }
 
@@ -115,6 +128,6 @@ public class accur {
            sum=sum+arr[i];
        }
 
-        System.out.println(sum/555);
+        System.out.println((sum/555)*100);
     }
 }
